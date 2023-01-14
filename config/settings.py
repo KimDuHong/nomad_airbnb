@@ -30,6 +30,10 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+THIRD_PARTY_APPLICATION = [
+    "rest_framework",
+    "rest_framework.authtoken",
+]
 defalut_app = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -49,9 +53,10 @@ custom_app = [
     "wishlists.apps.WishlistsConfig",
     "bookings.apps.BookingsConfig",
     "medias.apps.MediasConfig",
+    "direct_msgs.apps.DirectMsgsConfig",
 ]
 
-INSTALLED_APPS = defalut_app + custom_app
+INSTALLED_APPS = defalut_app + custom_app + THIRD_PARTY_APPLICATION
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
