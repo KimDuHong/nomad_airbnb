@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
 from .models import Experience, Perk
 from .serializers import PerkSerializer
-from rest_framework.response import Response
 
 # Create your views here.
 
@@ -21,14 +22,26 @@ class Perks(APIView):
 
 
 class PerkDetail(APIView):
-    def get_object(self, request):
-        pass
+    def get_object(self, pk):
+        try:
+            perk = Perk.objects.get(pk=pk)
+            return perk
+        except Perk.DoesNotExist:
+            return NotFound
 
     def get(self, request, pk):
-        pass
+        perk = self.get_object(pk)
+        serializer = PerkSerializer(perk)
+        return Response(serializer.data)
 
     def put(self, request, pk):
-        pass
+        perk = self.get_object(pk)
+        serializer = PerkSerializer(perk, data=request.data)
+        if serializer.is_valid():
+            update_perk = serializer.save()
+            return Response(PerkSerializer(update_perk).data)
 
     def delete(self, request, pk):
-        pass
+        perk = self.get_object(pk)
+        perk.delete()
+        return Response(status=204)
