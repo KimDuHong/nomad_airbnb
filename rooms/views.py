@@ -12,6 +12,8 @@ from rest_framework.exceptions import (
 )
 from django.db import transaction
 from reviews.serializers import ReviewSerializer
+from django.conf import settings
+from medias.serializers import PhotoSerializer
 
 # GET /api/v1/rooms
 # GET POST /api/v1/rooms/amenities
@@ -181,7 +183,7 @@ class RoomReviews(APIView):
             page = int(request.query_params.get("page", 1))
         except ValueError:
             page = 1
-        page_size = 5
+        page_size = settings.PAGE_SIZE
         start = (page - 1) * page_size
         end = start + page_size
         room = self.get_object(pk)
@@ -205,7 +207,7 @@ class RoomAmenities(APIView):
         except ValueError:
             page = 1
 
-        page_size = 5
+        page_size = settings.PAGE_SIZE
         start = (page - 1) * page_size
         end = start + page_size
         room = self.get_object(pk)
@@ -260,3 +262,25 @@ class AmenityDetail(APIView):
         amenity = self.get_object(pk)
         amenity.delete()
         return Response(status=204)
+
+
+class RoomPhotos(APIView):
+    def get_object(self, pk):
+        try:
+            return Room.objects.get(pk=pk)
+        except Room.DoesNotExist:
+            raise NotFound
+
+    def post(self, request, pk):
+        room = self.get_object(pk)
+        if not request.user.is_authenticated:
+            raise NotAuthenticated
+        if request.user != room.owner:
+            raise PermissionDenied
+        serializer = PhotoSerializer(data=request.data)
+        if serializer.is_valid():
+            photo = serializer.save(room=room)
+            serializer = PhotoSerializer(photo)
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
