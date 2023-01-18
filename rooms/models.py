@@ -52,6 +52,9 @@ class Room(CommonModel):
         related_name="rooms",
     )
 
+    # def reviews_count(self):
+    #     return self.reviews.count()
+
     def rating(self):
         count = self.reviews.count()
         if count:
@@ -66,7 +69,7 @@ class Room(CommonModel):
         return self.amenities.count()
 
     def __str__(self) -> str:
-        return self.city
+        return self.name
 
 
 class Amenity(CommonModel):
