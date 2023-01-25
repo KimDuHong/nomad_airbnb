@@ -5,7 +5,10 @@ from rest_framework import status
 from rest_framework.exceptions import ParseError, NotFound
 from rest_framework.permissions import IsAuthenticated
 from .models import User
+from reviews.serializers import ReviewSerializer
+from rooms.serializers import RoomListSerializer
 from . import serializers
+from django.conf import settings
 
 
 class Me(APIView):
@@ -64,7 +67,54 @@ class PublicUser(APIView):
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             raise NotFound
-        serializer = serializers.PrivateUserSerializer(user)
+        serializer = serializers.PublicUserSerializer(user)
+        return Response(serializer.data)
+
+
+class PublicUserReviews(APIView):
+    def get_object(self, username):
+        try:
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, username):
+        try:
+            page = int(request.query_params.get("page", 1))
+        except ValueError:
+            page = 1
+        page_size = settings.PAGE_SIZE
+        start = (page - 1) * page_size
+        end = start + page_size
+        user = self.get_object(username)
+        serializer = ReviewSerializer(
+            user.reviews.all()[start:end],
+            many=True,
+        )
+        return Response(serializer.data)
+
+
+class PublicUserRooms(APIView):
+    def get_object(self, username):
+        try:
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, username):
+        try:
+            page = int(request.query_params.get("page", 1))
+        except ValueError:
+            page = 1
+        page_size = settings.PAGE_SIZE
+        start = (page - 1) * page_size
+        end = start + page_size
+        user = self.get_object(username)
+        serializer = RoomListSerializer(
+            user.rooms.all()[start:end],
+            context={"request": request},
+            many=True,
+        )
         return Response(serializer.data)
 
 
