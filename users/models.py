@@ -30,7 +30,7 @@ class User(AbstractUser):
     is_host = models.BooleanField(
         null=True,
     )
-    avatar = models.ImageField(
+    avatar = models.URLField(
         null=True,
         blank=True,
     )
