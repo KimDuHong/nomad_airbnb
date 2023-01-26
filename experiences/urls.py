@@ -12,8 +12,8 @@ from .views import (
 
 urlpatterns = [
     path("", Experiences.as_view()),
-    path("<int:pk>", ExperienceDetail.as_view()),
     path("<int:pk>/perks", ExperiencePerk.as_view()),
+    path("<int:pk>", ExperienceDetail.as_view()),
     path("<int:pk>/bookings/all", ExperienceBookingAll.as_view()),
     path("<int:pk>/bookings/", ExperienceBooking.as_view()),
     path("<int:pk>/bookings/<int:booking_pk>", ExperienceBookingDetail.as_view()),
