@@ -90,14 +90,13 @@ class RoomDetail(APIView):
             if amenities_pk:
                 if not isinstance(amenities_pk, list):
                     raise ParseError("ameinities_pk must be a list")
-                with transaction.atomic():
-                    room.amenities.clear()
-                    for pk in amenities_pk:
-                        try:
-                            amenity = Amenity.objects.get(pk=pk)
-                            room.amenities.add(amenity)
-                        except Amenity.DoesNotExist:
-                            raise ParseError("Invalid Amenity pk")
+                room.amenities.clear()
+                for pk in amenities_pk:
+                    try:
+                        amenity = Amenity.objects.get(pk=pk)
+                        room.amenities.add(amenity)
+                    except Amenity.DoesNotExist:
+                        raise ParseError("Invalid Amenity pk")
 
             update_room = serializer.save()
             return Response(
@@ -155,8 +154,6 @@ class RoomList(APIView):
                 amenities = request.data.get("amenities")
                 if not isinstance(amenities, list):
                     if amenities:
-                        print(amenities)
-                        print(type(amenities))
                         raise ParseError("ameinities_pk must be a list")
                     else:
                         raise ParseError("ameinities are null")
@@ -322,11 +319,10 @@ class RoomBookings(APIView):
     def get(self, request, pk):
         room = self.get_object(pk)
         now = timezone.localtime(timezone.now()).date()
-        print(now)
         bookings = Booking.objects.filter(
             room=room,
             kind=Booking.BookingKindChoices.ROOM,
-            check_in__gt=now,
+            check_in__gte=now,
         )
         serializer = PublicBookingSerializer(bookings, many=True)
         return Response(serializer.data)

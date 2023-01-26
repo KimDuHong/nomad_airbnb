@@ -5,6 +5,7 @@ from .models import Booking
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     list_display = (
+        "pk",
         "kind",
         "user",
         "room",

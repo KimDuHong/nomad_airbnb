@@ -1,9 +1,12 @@
 from django.utils import timezone
 from rest_framework import serializers
 from .models import Booking
+import datetime
 
 
 class PublicBookingSerializer(serializers.ModelSerializer):
+    is_past = serializers.SerializerMethodField()
+
     class Meta:
         model = Booking
         fields = (
@@ -13,7 +16,16 @@ class PublicBookingSerializer(serializers.ModelSerializer):
             "check_out",
             "experience_time",
             "guests",
+            "is_past",
         )
+
+    def get_is_past(self, obj):
+        now = timezone.localtime(timezone.now()).date()
+        compare_time = (obj.experience_time + timezone.timedelta(hours=9)).date()
+        if now > compare_time:
+            return True
+        else:
+            return False
 
 
 # check_in and check_out want to requried fields
@@ -54,3 +66,18 @@ class CreateRoomBookingSerializer(serializers.ModelSerializer):
         ).exists():
             raise serializers.ValidationError("Reservation Allready.")
         return value
+
+
+class CreateExperienceBookingSerializer(serializers.ModelSerializer):
+    experience_time = serializers.DateTimeField()
+
+    class Meta:
+        model = Booking
+        fields = ("experience_time", "guests")
+
+    def validate_experience_time(self, value):
+        now = timezone.localtime(timezone.now())
+        if value < now:
+            raise serializers.ValidationError("이미 지났습니다.")
+        else:
+            return value
