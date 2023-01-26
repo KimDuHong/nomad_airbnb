@@ -130,6 +130,13 @@ class ExperienceDetail(APIView):
         else:
             return Response(serializer.errors)
 
+    def delete(self, request, pk):
+        expereince = self.get_object(pk)
+        if request.user != expereince.host:
+            raise PermissionDenied
+        expereince.delete()
+        return Response(status=204)
+
 
 class ExperiencePerk(APIView):
     def get_object(self, pk):
@@ -203,6 +210,14 @@ class ExperienceBookingAll(APIView):
             raise NotFound
 
     def get(self, request, pk):
+        try:
+            page = int(request.query_params.get("page", 1))
+        except ValueError:
+            page = 1
+        page_size = settings.PAGE_SIZE
+        start = (page - 1) * page_size
+        end = start + page_size
+
         experience = self.get_object(pk)
         now = timezone.localtime(timezone.now()).date()
         bookings = Booking.objects.filter(
@@ -210,7 +225,7 @@ class ExperienceBookingAll(APIView):
             kind=Booking.BookingKindChoices.EXPERIENCE,
         )
         serializer = PublicBookingSerializer(
-            bookings,
+            bookings[start:end],
             many=True,
         )
         return Response(serializer.data)
