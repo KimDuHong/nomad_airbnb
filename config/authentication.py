@@ -33,5 +33,5 @@ class JWTAuthentication(BaseAuthentication):
         try:
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
-            raise AuthenticationFailed("User not found")``
+            raise AuthenticationFailed("User not found")
         return (user, None)
