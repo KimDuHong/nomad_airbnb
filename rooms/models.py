@@ -63,7 +63,7 @@ class Room(CommonModel):
                 total += review["rating"]
             return round(total / count, 2)
         else:
-            return "no reviews"
+            return "No Review"
 
     def total_amenities(self):
         return self.amenities.count()

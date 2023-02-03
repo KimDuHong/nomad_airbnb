@@ -19,6 +19,8 @@ from medias.serializers import PhotoSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from bookings.models import Booking
 from bookings.serializers import PublicBookingSerializer, CreateRoomBookingSerializer
+import time
+
 
 # GET /api/v1/rooms
 # GET POST /api/v1/rooms/amenities
@@ -26,6 +28,7 @@ from bookings.serializers import PublicBookingSerializer, CreateRoomBookingSeria
 
 
 class RoomDetail(APIView):
+
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def is_negative(self, value):
@@ -41,6 +44,7 @@ class RoomDetail(APIView):
             raise NotFound
 
     def get(self, request, pk):
+        time.sleep(2)
         room = self.get_object(pk)
         serializer = RoomDetailSerializer(
             room,

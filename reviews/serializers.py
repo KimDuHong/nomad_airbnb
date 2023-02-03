@@ -5,6 +5,7 @@ from users.serializers import TinyUserSerializer
 
 class ReviewSerializer(serializers.ModelSerializer):
     user = TinyUserSerializer(read_only=True)
+    created_at = serializers.SerializerMethodField()
 
     class Meta:
         model = Review
@@ -12,4 +13,8 @@ class ReviewSerializer(serializers.ModelSerializer):
             "user",
             "payload",
             "rating",
+            "created_at",
         )
+
+    def get_created_at(self, obj):
+        return obj.created_at.date()
