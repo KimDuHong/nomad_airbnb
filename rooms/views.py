@@ -64,45 +64,45 @@ class RoomDetail(APIView):
             partial=True,
         )
         if serializer.is_valid():
-            # ------check NEGATIVE VALUE ------------------------
+            with transaction.atomic():
+                # ------check NEGATIVE VALUE ------------------------
 
-            price = request.data.get("price")
-            if self.is_negative(price):
-                raise ParseError("negative price")
-            rooms = request.data.get("rooms")
-            if self.is_negative(rooms):
-                raise ParseError("negative rooms_count")
-            toilets = request.data.get("toilets")
-            if self.is_negative(toilets):
-                raise ParseError("negative toilets_count")
+                price = request.data.get("price")
+                if self.is_negative(price):
+                    raise ParseError("negative price")
+                rooms = request.data.get("rooms")
+                if self.is_negative(rooms):
+                    raise ParseError("negative rooms_count")
+                toilets = request.data.get("toilets")
+                if self.is_negative(toilets):
+                    raise ParseError("negative toilets_count")
 
-            # ------check AMENITY ------------------------
-
-            category_pk = request.data.get("category")
-            if category_pk:
-                try:
-                    category = Category.objects.get(pk=category_pk)
-                    if category.kind == Category.CategoryKindChoices.EXPERIENCES:
-                        raise ParseError("Must Be Rooms")
-                    room.category = category
-                except Category.DoesNotExist:
-                    raise ParseError("Invalid Category pk")
-
-            # ------check CATEGORY ------------------------
-
-            amenities_pk = request.data.get("amenities")
-            if amenities_pk:
-                if not isinstance(amenities_pk, list):
-                    raise ParseError("ameinities_pk must be a list")
-                room.amenities.clear()
-                for pk in amenities_pk:
+                # ------check AMENITY ------------------------
+                category_pk = request.data.get("category")
+                if category_pk:
                     try:
-                        amenity = Amenity.objects.get(pk=pk)
-                        room.amenities.add(amenity)
-                    except Amenity.DoesNotExist:
-                        raise ParseError("Invalid Amenity pk")
+                        category = Category.objects.get(pk=category_pk)
+                        if category.kind == Category.CategoryKindChoices.EXPERIENCES:
+                            raise ParseError("Must Be Rooms")
+                        room.category = category
+                    except Category.DoesNotExist:
+                        raise ParseError("Invalid Category pk")
 
-            update_room = serializer.save()
+                # ------check CATEGORY ------------------------
+
+                amenities_pk = request.data.get("amenities")
+                if amenities_pk:
+                    if not isinstance(amenities_pk, list):
+                        raise ParseError("ameinities_pk must be a list")
+                    room.amenities.clear()
+                    for pk in amenities_pk:
+                        try:
+                            amenity = Amenity.objects.get(pk=pk)
+                            room.amenities.add(amenity)
+                        except Amenity.DoesNotExist:
+                            raise ParseError("Invalid Amenity pk")
+
+                update_room = serializer.save()
             return Response(
                 RoomDetailSerializer(
                     update_room,

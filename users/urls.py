@@ -10,6 +10,7 @@ from .views import (
     PublicUserReviews,
     PublicUserRooms,
     JWTLogin,
+    GithubLogIn,
 )
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     path("change-password", ChangePassword.as_view()),  # put
     path("token-login", obtain_auth_token),
     path("jwt-login", JWTLogin.as_view()),  #
+    path("github", GithubLogIn.as_view()),
 ]

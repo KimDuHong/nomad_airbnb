@@ -11,6 +11,7 @@ from reviews.serializers import ReviewSerializer
 from rooms.serializers import RoomListSerializer
 from . import serializers
 from django.conf import settings
+import requests
 
 
 class Me(APIView):
@@ -184,3 +185,66 @@ class JWTLogin(APIView):
             return Response({"token": token})
         else:
             return Response({"Error": "Wrong Passwrod"})
+
+
+class GithubLogIn(APIView):
+    def post(self, request):
+        try:
+            # <---post 시 담겨오는 토큰값을 받아오고 해당 값으로 post 요청 -->
+            # <----------토큰 교체 --------->
+            git_url = "https://github.com/login/oauth/access_token"
+            code = "?code=" + request.data.get("code")
+            client_id = "&client_id=34e6a768f8bfa936a0a6"
+            client_secrect = f"&client_secret={settings.GH_SECRET}"
+            access_token = (
+                requests.post(
+                    git_url + code + client_id + client_secrect,
+                    headers={"Accept": "application/json"},
+                )
+                .json()
+                .get("access_token")
+            )
+            # <---------- 받아온 토큰 값으로 유저 데이터를 요청 ------->
+            user_data = requests.get(
+                "https://api.github.com/user",
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Accept": "application/json",
+                },
+            ).json()
+
+            # 이메일이 3개가 들어옴 그중 첫번쨰
+
+            user_email = requests.get(
+                "https://api.github.com/user/emails",
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Accept": "application/json",
+                },
+            ).json()[0]
+
+            # 이메일이 같은 유저가 있으면 로그인, 혹은 회원가입
+
+            try:
+                user = User.objects.get(email=user_email.get("email"))
+            except User.DoesNotExist:
+                if user_data.get("name") == None:
+                    user_name = user_data.get("login")
+                else:
+                    user_name = user_data.get("name")
+                user = User.objects.create(
+                    username=user_data.get("login"),
+                    name=user_name,
+                    avatar=user_data.get("avatar"),
+                    email=user_email.get("email"),
+                )
+                # 깃허브 로그인 유저는 패스워드 사용 불가
+                user.set_unusable_password()
+                user.save()
+
+            login(request, user)
+            return Response(status=200)
+
+        except Exception as e:
+            print(e)
+            return Response(status=400)
