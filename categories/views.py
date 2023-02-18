@@ -1,5 +1,4 @@
 from .models import Category
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import CategorySerializer
 from rest_framework.status import HTTP_204_NO_CONTENT

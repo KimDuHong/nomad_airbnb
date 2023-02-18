@@ -11,6 +11,7 @@ from .views import (
     PublicUserRooms,
     JWTLogin,
     GithubLogIn,
+    KakaoLogin,
 )
 
 urlpatterns = [
@@ -25,4 +26,5 @@ urlpatterns = [
     path("token-login", obtain_auth_token),
     path("jwt-login", JWTLogin.as_view()),  #
     path("github", GithubLogIn.as_view()),
+    path("kakao", KakaoLogin.as_view()),
 ]
