@@ -15,6 +15,12 @@ class User(AbstractUser):
         WON = "won", "korean Won"
         USD = "usd", "Dollar"
 
+    email = models.EmailField(
+        verbose_name="email",
+        max_length=255,
+        unique=True,
+    )
+
     first_name = models.CharField(
         max_length=100,
         editable=False,
@@ -37,12 +43,18 @@ class User(AbstractUser):
     gender = models.CharField(
         max_length=10,
         choices=GenderChoices.choices,
+        null=True,
+        blank=True,
     )
     language = models.CharField(
         max_length=2,
         choices=LanguageChoices.choices,
+        null=True,
+        blank=True,
     )
     currency = models.CharField(
         max_length=10,
         choices=CurrencyChoices.choices,
+        null=True,
+        blank=True,
     )

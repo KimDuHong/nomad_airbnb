@@ -11,6 +11,7 @@ from reviews.serializers import ReviewSerializer
 from rooms.serializers import RoomListSerializer
 from . import serializers
 from django.conf import settings
+from rest_framework.exceptions import ValidationError
 import requests
 
 
@@ -39,6 +40,15 @@ class Me(APIView):
 
 
 class Users(APIView):
+    def validate_password(self, password):
+        import re
+
+        REGEX_PASSWORD = "^(?=.*[\d])(?=.*[a-z])(?=.*[!@#$%^&*()])[\w\d!@#$%^&*()]{8,}$"
+        if not re.fullmatch(REGEX_PASSWORD, password):
+            raise ParseError(
+                "비밀번호를 확인하세요. 최소 1개 이상의 소문자, 숫자, 특수문자로 구성되어야 하며 길이는 8자리 이상이어야 합니다."
+            )
+
     def post(self, request):
         password = request.data.get("password")
         if not password:
@@ -49,19 +59,20 @@ class Users(APIView):
 
         serializer = serializers.PrivateUserSerializer(data=request.data)
         if serializer.is_valid():
+            password = str(password)
+            self.validate_password(password)
             user = serializer.save()
             user.set_password(password)
 
             # user.password = password 시에는 raw password로 저장
-
             user.save()
 
             # set_password 후 다시 저장
-
             serializer = serializers.PrivateUserSerializer(user)
+            login(request, user)
             return Response(serializer.data)
         else:
-            return Response(serializer.errors)
+            return Response(serializer.errors, status=400)
 
 
 class PublicUser(APIView):
@@ -154,7 +165,7 @@ class LogIn(APIView):
             login(request, user)
             return Response({"OK": f"Welcome! {user}"})
         else:
-            return Response({"Error": "Wrong Passwrod"})
+            return Response({"Error": "Wrong Passwrod"}, status=400)
 
 
 class LogOut(APIView):
