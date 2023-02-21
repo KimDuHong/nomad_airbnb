@@ -11,6 +11,7 @@ class AmenitySerializer(ModelSerializer):
     class Meta:
         model = Amenity
         fields = (
+            "pk",
             "name",
             "description",
         )
@@ -44,7 +45,11 @@ class RoomDetailSerializer(ModelSerializer):
         return obj.rating()
 
     def get_is_owner(self, obj):
-        return obj.owner == self.context["request"].user
+        request = self.context.get("reqeust")
+        if request:
+            return obj.owner == self.context["request"].user
+        else:
+            return False
 
     def get_reviews_count(self, obj):
         return obj.reviews.count()
@@ -53,12 +58,13 @@ class RoomDetailSerializer(ModelSerializer):
         return obj.amenities.count()
 
     def get_is_liked(self, obj):
-        request = self.context["request"]
-        if request.user.is_authenticated:
-            return Wishlist.objects.filter(
-                user=request.user,
-                rooms__pk=obj.pk,
-            ).exists()
+        request = self.context.get("request")
+        if request:
+            if request.user.is_authenticated:
+                return Wishlist.objects.filter(
+                    user=request.user,
+                    rooms__pk=obj.pk,
+                ).exists()
         else:
             return False
 
@@ -90,4 +96,8 @@ class RoomListSerializer(ModelSerializer):
         return obj.rating()
 
     def get_is_owner(self, obj):
-        return obj.owner == self.context["request"].user
+        request = self.context.get("request")
+        if request:
+            return obj.owner == self.context["request"].user
+        else:
+            return False
