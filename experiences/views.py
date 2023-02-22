@@ -30,9 +30,13 @@ class Experiences(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = ExperienceSerializer(data=request.data)
+        serializer = ExperienceDetailSerializer(data=request.data)
         if serializer.is_valid():
             with transaction.atomic():
+                price = request.data.get("price")
+                if price:
+                    if price < 0:
+                        raise ParseError("price is lower than 0")
                 category_pk = request.data.get("category")
                 if not category_pk:
                     raise ParseError("Invalid category")
