@@ -58,14 +58,19 @@ class CreateRoomBookingSerializer(serializers.ModelSerializer):
 
     # 특정 필드가 아닌 validator 자체에서 띄우는 에러
     def validate(self, value):
-        if value["check_in"] >= value["check_out"]:
-            raise serializers.ValidationError("체크아웃이 체크인보다 빠릅니다.")
-        if Booking.objects.filter(
-            check_in__lte=value["check_out"],
-            check_out__gte=value["check_in"],
-        ).exists():
-            raise serializers.ValidationError("Reservation Allready.")
-        return value
+        room = self.context.get("room")
+        if room:
+            if value["check_in"] >= value["check_out"]:
+                raise serializers.ValidationError("체크아웃이 체크인보다 빠릅니다.")
+            if Booking.objects.filter(
+                room=room,
+                check_in__lte=value["check_out"],
+                check_out__gte=value["check_in"],
+            ).exists():
+                raise serializers.ValidationError("Reservation Allready.")
+            return value
+        else:
+            raise serializers.ValidationError("Error")
 
 
 class CreateExperienceBookingSerializer(serializers.ModelSerializer):

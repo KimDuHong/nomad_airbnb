@@ -105,7 +105,6 @@ class ExperienceDetail(APIView):
             price = request.data.get("price")
             if self.is_negative(price):
                 raise ParseError("negative price")
-
             category_pk = request.data.get("category")
             if category_pk:
                 try:

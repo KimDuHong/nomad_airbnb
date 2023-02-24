@@ -3,6 +3,7 @@ from .models import Perk, Experience
 from users.serializers import TinyUserSerializer
 from categories.serializers import CategorySerializer, CategoryNameSerializer
 from rest_framework import serializers
+from rest_framework.serializers import ValidationError
 from django.utils import timezone
 
 
@@ -58,22 +59,28 @@ class ExperienceDetailSerializer(ModelSerializer):
     def validate_start(self, value):
         now = timezone.localtime(timezone.now()).time()
         if value < now:
-            raise serializers.ValidationError(
-                "Start time must be later than the current time"
-            )
+            raise ValidationError("Start time must be later than the current time")
         else:
             return value
 
     def validate_end(self, value):
         now = timezone.localtime(timezone.now()).time()
         if value < now:
-            raise serializers.ValidationError("End time is earlier than current time.")
+            raise ValidationError("End time is earlier than current time.")
         else:
             return value
 
     # 특정 필드가 아닌 validator 자체에서 띄우는 에러
     def validate(self, value):
-        if value["start"] >= value["end"]:
-            raise serializers.ValidationError("End time is earlier than start time.")
+        if value.get("end") or value.get("start"):
+            if value.get("end") and value.get("start"):
+                if value.get("start") >= value.get("end"):
+                    raise ValidationError("End time is earlier than start time.")
+                else:
+                    return value
+            else:
+                raise ValidationError(
+                    "The start entry must be entered as end. The opposite is the same."
+                )
         else:
             return value

@@ -25,6 +25,10 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
+GH_SECRET = env("GH_SECRET")
+CF_TOKEN = env("CF_TOKEN")
+CF_ID = env("CF_ID")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -181,4 +185,3 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-GH_SECRET = env("GH_SECRET")
