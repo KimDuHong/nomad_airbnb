@@ -45,7 +45,7 @@ class RoomDetailSerializer(ModelSerializer):
         return obj.rating()
 
     def get_is_owner(self, obj):
-        request = self.context.get("reqeust")
+        request = self.context.get("request")
         if request:
             return obj.owner == self.context["request"].user
         else:
