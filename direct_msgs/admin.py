@@ -5,7 +5,8 @@ from .models import Chatting_Room, Message
 @admin.register(Chatting_Room)
 class Chatting_RoomAdmin(admin.ModelAdmin):
     list_display = (
-        "__str__",
+        "pk",
+        "name",
         "created_at",
         "updated_at",
     )

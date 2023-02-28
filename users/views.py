@@ -155,7 +155,7 @@ class LogIn(APIView):
         username = request.data.get("username")
         password = request.data.get("password")
         if not username or not password:
-            raise ParseError("Invalid username or password")
+            raise ParseError
         user = authenticate(
             request,
             username=username,
@@ -163,9 +163,9 @@ class LogIn(APIView):
         )
         if user:
             login(request, user)
-            return Response({"OK": f"Welcome! {user}"})
+            return Response({"ok": "Welcome!"})
         else:
-            return Response({"Error": "Wrong Passwrod"}, status=400)
+            return Response({"error": "wrong password"})
 
 
 class LogOut(APIView):

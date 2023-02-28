@@ -43,6 +43,9 @@ THIRD_PARTY_APPLICATION = [
     "corsheaders",
 ]
 defalut_app = [
+    "daphne",
+    "channels",
+    "direct_msgs",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -61,7 +64,7 @@ custom_app = [
     "wishlists.apps.WishlistsConfig",
     "bookings.apps.BookingsConfig",
     "medias.apps.MediasConfig",
-    "direct_msgs.apps.DirectMsgsConfig",
+    # "direct_msgs.apps.DirectMsgsConfig",
 ]
 
 INSTALLED_APPS = defalut_app + custom_app + THIRD_PARTY_APPLICATION
@@ -70,8 +73,8 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -94,10 +97,15 @@ TEMPLATES = [
         },
     },
 ]
+from channels.layers import get_channel_layer
 
 WSGI_APPLICATION = "config.wsgi.application"
+ASGI_APPLICATION = "config.asgi.application"
 
-
+CHANNEL_LAYERS = {
+    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
+}
+channel_layer = get_channel_layer()
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -162,10 +170,10 @@ PAGE_SIZE = 5
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
         "config.authentication.TrustMeBroAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
         "config.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ]
 }
 
@@ -182,6 +190,6 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://localhost:3000",
 ]
