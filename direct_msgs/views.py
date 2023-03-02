@@ -15,6 +15,7 @@ class ChattingRoomList(APIView):
         serializer = ChatRoomListSerializer(
             all_chat_list,
             many=True,
+            context={"request": request},
         )
         return Response(serializer.data)
 

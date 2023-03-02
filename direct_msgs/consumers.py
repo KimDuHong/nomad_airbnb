@@ -45,13 +45,12 @@ class TextRoomConsumer(WebsocketConsumer):
             )
             # Update chat list with new last message
             last_message = text
-            room_id = self.room_name
-
-            print(self.user.username + "__notifications")
-            async_to_sync(self.channel_layer.group_send)(
-                "__notifications",
-                {"type": "unread_count", "message": 1, "room_id": 1},
-            )
+            for user in room.users.all():
+                chat_room = user.username + "_notifications"
+                async_to_sync(self.channel_layer.group_send)(
+                    chat_room,
+                    {"type": "new_data", "text": last_message, "room_id": room.id},
+                )
 
     def chat_message(self, event):
         text = event["message"]
@@ -79,24 +78,16 @@ class NotificationConsumer(JsonWebsocketConsumer):
         except User.DoesNotExist:
             return
 
+        # set notification group name
+        self.notification_group_name = self.user.username + "_notifications"
+
         self.accept()
 
-        # private notification group
-        self.notification_group_name = "__notifications"
+        # add channel to notification group
         async_to_sync(self.channel_layer.group_add)(
             self.notification_group_name,
             self.channel_name,
         )
-        # print("__notifications")
-
-        # # Send count of unread messages
-        # # unread_count = Message.objects.filter(user=self.user).count()
-        # self.send_json(
-        #     {
-        #         "type": "unread_count",
-        #         "1": 1,
-        #     }
-        # )
 
     def disconnect(self, code):
         async_to_sync(self.channel_layer.group_discard)(
@@ -105,8 +96,5 @@ class NotificationConsumer(JsonWebsocketConsumer):
         )
         return super().disconnect(code)
 
-    def new_message_notification(self, event):
-        self.send_json(event)
-
-    def unread_count(self, event):
+    def new_data(self, event):
         self.send_json(event)

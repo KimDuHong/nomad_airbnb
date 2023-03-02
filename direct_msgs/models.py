@@ -54,6 +54,7 @@ class Message(CommonModel):
         on_delete=models.CASCADE,
         related_name="messages",
     )
+    is_read = models.BooleanField(default=False)
     sequence_number = models.PositiveIntegerField(default=0)
 
     class Meta:
