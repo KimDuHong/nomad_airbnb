@@ -41,7 +41,8 @@ class Chatting_Room(CommonModel):
 
 class Message(CommonModel):
     text = models.TextField()
-    user = models.ForeignKey(
+    # room = models.ForeignKey("rooms.")
+    sender = models.ForeignKey(
         "users.User",
         null=True,
         blank=True,
@@ -75,7 +76,6 @@ class Message(CommonModel):
         # delete old messages if there are more than 100 messages in the chat room
         max_messages = 100
         num_messages = self.room.messages.count()
-        print(num_messages)
         if num_messages >= max_messages:
             # find the oldest messages and delete them
             messages_to_delete = self.room.messages.order_by("sequence_number")[

@@ -16,7 +16,7 @@ class Chatting_RoomAdmin(admin.ModelAdmin):
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     list_display = (
-        "user",
+        "sender",
         "text",
         "room",
         "created_at",

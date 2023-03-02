@@ -4,7 +4,7 @@ from users.serializers import TinyUserSerializer
 
 
 class ChatListSerializer(serializers.ModelSerializer):
-    user = TinyUserSerializer()
+    sender = TinyUserSerializer()
 
     class Meta:
         model = Message
@@ -30,7 +30,7 @@ class ChatRoomListSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-    user = TinyUserSerializer(read_only=True)
+    sender = TinyUserSerializer(read_only=True)
 
     class Meta:
         model = Message

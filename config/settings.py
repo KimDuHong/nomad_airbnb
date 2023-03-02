@@ -54,7 +54,6 @@ defalut_app = [
     "django.contrib.staticfiles",
 ]
 custom_app = [
-    "houses.apps.HousesConfig",
     "users.apps.UsersConfig",
     "rooms.apps.RoomsConfig",
     "common.apps.CommonConfig",
