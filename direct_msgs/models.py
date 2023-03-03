@@ -36,7 +36,7 @@ class Chatting_Room(CommonModel):
     #     self.save()
 
     def __str__(self) -> str:
-        return self.name
+        return str(self.pk) + "'s " + self.name
 
 
 class Message(CommonModel):
@@ -62,7 +62,7 @@ class Message(CommonModel):
         unique_together = ["room", "sequence_number"]
 
     def __str__(self) -> str:
-        return f"{self.user} to {self.room} : {self.text}"
+        return f"{self.sender} to {self.room} : {self.text}"
 
     def save(self, *args, **kwargs):
         # set the sequence number of the new message to the highest sequence number in the chat room plus one
@@ -87,5 +87,7 @@ class Message(CommonModel):
 
         # update the last activity timestamp of the chat room to the current time
         # self.room.update_last_activity()
+        self.room.updated_at = timezone.now()
+        self.room.save(update_fields=["updated_at"])
 
         super(Message, self).save(*args, **kwargs)

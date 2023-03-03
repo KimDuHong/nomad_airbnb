@@ -33,6 +33,7 @@ class ChattingList(APIView):
         room = self.get_object(pk)
         if request.user in room.users.all():
             msg = Message.objects.filter(room=room).reverse()
+            msg.exclude(sender=request.user).update(is_read=True)
             serializer = ChatListSerializer(
                 msg,
                 many=True,
