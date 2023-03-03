@@ -64,56 +64,27 @@ python manage.py runserver
 This is a personal project and contributions are not currently accepted. However, feedback and suggestions are always welcome.
 
 # Features Implemented
+### DB MODEL
 
-## DB
--User
-Extends Django's built-in AbstractUser model.
-Has additional fields for name, is_host, avatar, gender, language, and currency.
--Category
-Represents categories of listings, such as rooms or experiences.
-Has a name and a kind field, which can be rooms or experiences.
--Amenity
-Represents amenities that a room can have.
-Has a name and description field.
--Room
-Represents a listing for a room.
-Has a name, country, city, price, number of rooms, number of toilets, description, address, pet-friendly status, kind, owner, and a category field.
-Has a many-to-many relationship with Amenity through amenities field.
-Has a one-to-many relationship with Photo through photos field.
-Has a one-to-many relationship with Review through reviews field.
-Has a many-to-many relationship with Wishlist through wishlists field.
--Photo
-Represents a photo for a room.
-Has a file and a description field.
-Belongs to a Room through room field.
--Review
-Represents a review from a User to a Room or Experience.
-Has a user, a room, an experience, a payload, and a rating field.
--Experience
-Represents a listing for an experience.
-Has a country, city, name, host, price, address, start, end, description, and a category field.
-Has a many-to-many relationship with Perk through perks field.
-Has a one-to-one relationship with Video through video field.
-Has a one-to-many relationship with Photo through photos field.
-Has a one-to-many relationship with Review through reviews field.
-Has a many-to-many relationship with Wishlist through wishlists field.
--Perk
-Represents a perk that an experience can have.
-Has a name, details, and explanation field.
--Video
-Represents a video for an experience.
-Has a file field.
-Belongs to an Experience through experience field.
--Wishlist
-Represents a wishlist created by a User.
-Has a name and a user field.
-Has a many-to-many relationship with Room through rooms field.
-Has a many-to-many relationship with Experience through experiences field.
--Chatting_Room
-Represents a chatting room created by users.
-Has a name field.
-Has a many-to-many relationship with User through users field.
-Has a one-to-many relationship with Message through messages field.
--Message
-Represents a message sent in a Chatting_Room.
-Has a text, a sender, a room, a read status, and a sequence number field.
+- User 
+- Category 
+- Room
+- Amenity
+- Review
+- Perk
+- Media
+- Chatting_room
+- Messages
+- Wishlist
+
+
+### API
+
+- api/v1/rooms
+- api/v1/categories
+- api/v1/experiences
+- api/v1/medias
+- api/v1/wishlists
+- api/v1/users
+- api/v1/direct_msegs
+- ....
