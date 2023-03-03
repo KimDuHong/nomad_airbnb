@@ -67,6 +67,7 @@ class TextRoomConsumer(WebsocketConsumer):
         elif type == "read_msg":
             dict_data = text_data_json
             room = Chatting_Room.objects.get(pk=dict_data.get("room"))
+            user = User.objects.get(username=user)
             for user in room.users.all():
                 if user.username != dict_data.get("sender"):
                     async_to_sync(self.channel_layer.group_send)(
@@ -76,13 +77,13 @@ class TextRoomConsumer(WebsocketConsumer):
                             "sender": dict_data.get("sender"),
                         },
                     )
-                # else:
-                #     async_to_sync(self.channel_layer.group_send)(
-                #         user.username + "_notifications",
-                #         {
-                #             "type": "update_count",
-                #         },
-                #     )
+                else:
+                    async_to_sync(self.channel_layer.group_send)(
+                        user.username + "_notifications",
+                        {
+                            "type": "update_count",
+                        },
+                    )
         #     unread_message = Message.objects.filter(room=room, is_read=False).exclude(
         #         sender=self.user
         #     )
