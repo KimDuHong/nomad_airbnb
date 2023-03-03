@@ -28,11 +28,10 @@ This website serves as a personal portfolio where I can showcase my work and pro
 
 ## Technologies Used
 
-- React
-- React-hook-form
-- Chakra UI
-- React-router-dom
-- React queries
+- Django
+- Django REST Framework
+- daphne
+- channels
 - ...
 
 ## Installation and Setup
@@ -51,15 +50,14 @@ cd nomad_airbnb
 
 3. Install dependencies: 
 
-npm install
+poetry init and poetry shell 
 
 
 4. Start the development server: 
 
-npm start
+python manage.py runserver
 
-
-5. Open the project in your web browser at `http://localhost:3000`
+5. Open the project in your web browser at `http://localhost:8000`
 
 ## Contributing
 
@@ -67,23 +65,55 @@ This is a personal project and contributions are not currently accepted. However
 
 # Features Implemented
 
-## LogIn, LogOut, Sign Up
-- User authentication and account management
-- Secure sign up with email, GitHub, or Kakao account
-- Easy log in with email, GitHub, or Kakao account
-- Log out feature to end current session
-- Show Rooms and Upload Rooms!
-- View available rooms
-- Upload new rooms with description and images
-## Room Reservation
-- Check room availability
-- Make reservations with date and time details
-- View upcoming reservations, cancel or modify them
-## Dark Mode
-- Personalized viewing experience with dark color palette
-## Chat Function
-- Real-time 1:1 chat with web socket
-- Sorts chats by user and time
-- Stores chat logs and rooms for continued chatting
-- Displays chat room list and last message
-- Updates chat count and marks as read/unread ...
+## DB
+-User
+Extends Django's built-in AbstractUser model.
+Has additional fields for name, is_host, avatar, gender, language, and currency.
+-Category
+Represents categories of listings, such as rooms or experiences.
+Has a name and a kind field, which can be rooms or experiences.
+-Amenity
+Represents amenities that a room can have.
+Has a name and description field.
+-Room
+Represents a listing for a room.
+Has a name, country, city, price, number of rooms, number of toilets, description, address, pet-friendly status, kind, owner, and a category field.
+Has a many-to-many relationship with Amenity through amenities field.
+Has a one-to-many relationship with Photo through photos field.
+Has a one-to-many relationship with Review through reviews field.
+Has a many-to-many relationship with Wishlist through wishlists field.
+-Photo
+Represents a photo for a room.
+Has a file and a description field.
+Belongs to a Room through room field.
+-Review
+Represents a review from a User to a Room or Experience.
+Has a user, a room, an experience, a payload, and a rating field.
+-Experience
+Represents a listing for an experience.
+Has a country, city, name, host, price, address, start, end, description, and a category field.
+Has a many-to-many relationship with Perk through perks field.
+Has a one-to-one relationship with Video through video field.
+Has a one-to-many relationship with Photo through photos field.
+Has a one-to-many relationship with Review through reviews field.
+Has a many-to-many relationship with Wishlist through wishlists field.
+-Perk
+Represents a perk that an experience can have.
+Has a name, details, and explanation field.
+-Video
+Represents a video for an experience.
+Has a file field.
+Belongs to an Experience through experience field.
+-Wishlist
+Represents a wishlist created by a User.
+Has a name and a user field.
+Has a many-to-many relationship with Room through rooms field.
+Has a many-to-many relationship with Experience through experiences field.
+-Chatting_Room
+Represents a chatting room created by users.
+Has a name field.
+Has a many-to-many relationship with User through users field.
+Has a one-to-many relationship with Message through messages field.
+-Message
+Represents a message sent in a Chatting_Room.
+Has a text, a sender, a room, a read status, and a sequence number field.
