@@ -1,10 +1,12 @@
 from rest_framework import serializers
 from .models import Chatting_Room, Message
 from users.serializers import TinyUserSerializer
+from django.utils import timezone
 
 
 class ChatListSerializer(serializers.ModelSerializer):
     sender = TinyUserSerializer()
+    time = serializers.SerializerMethodField()
 
     class Meta:
         model = Message
@@ -12,7 +14,13 @@ class ChatListSerializer(serializers.ModelSerializer):
             "id",
             "room",
             "updated_at",
+            "created_at",
         )
+
+    def get_time(self, obj):
+        # Convert the created_at field to the desired format
+        created_at = obj.created_at.astimezone(timezone.get_current_timezone())
+        return created_at.strftime("%H:%M")
 
 
 class ChatRoomListSerializer(serializers.ModelSerializer):

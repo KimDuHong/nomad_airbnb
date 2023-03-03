@@ -6,6 +6,7 @@ from users.models import User
 from .models import Chatting_Room, Message
 from .serilizers import MessageSerializer
 from users.serializers import TinyUserSerializer
+from django.utils import timezone
 
 
 class TextRoomConsumer(WebsocketConsumer):
@@ -36,12 +37,19 @@ class TextRoomConsumer(WebsocketConsumer):
             return
         room = Chatting_Room.objects.get(pk=self.room_name)
         if not type:
-            Message.objects.create(text=text, sender=user, room=room)
+            msg = Message.objects.create(text=text, sender=user, room=room)
             user = TinyUserSerializer(user).data
 
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
-                {"type": "chat_message", "message": text, "sender": user},
+                {
+                    "type": "chat_message",
+                    "message": text,
+                    "sender": user,
+                    "time": msg.created_at.astimezone(
+                        timezone.get_current_timezone()
+                    ).strftime("%H:%M"),
+                },
             )
             # Update chat list with new last message
             last_message = text
@@ -99,7 +107,9 @@ class TextRoomConsumer(WebsocketConsumer):
     def chat_message(self, event):
         text = event["message"]
         sender = event["sender"]
-        self.send(text_data=json.dumps({"text": text, "sender": sender}))
+        time = str(event["time"])
+        print(time)
+        self.send(text_data=json.dumps({"text": text, "sender": sender, "time": time}))
 
 
 from .models import Message, Chatting_Room
